@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.PreviewImageFragment"
+    android:fitsSystemWindows="true"
+    >
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/preview_pager"
+        >
+
+
+
+
+
+    </android.support.v4.view.ViewPager>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/default_margin"
+        android:text="@string/determine"
+        android:id="@+id/pager_determine"
+        android:background="@color/colorTeal"
+        android:textColor="@color/colorWhite"
+        />
+
+
+    <ImageView
+        android:layout_width="@dimen/default_press"
+        android:layout_height="@dimen/default_press"
+        android:src="@drawable/ic_arrow_back_black_24dp"
+        android:scaleType="center"
+        android:tint="@color/colorTeal"
+        android:contentDescription="@string/back"
+        android:id="@+id/back_to_album"
+        android:layout_marginTop="@dimen/default_margin"
+        />
+
+</FrameLayout>

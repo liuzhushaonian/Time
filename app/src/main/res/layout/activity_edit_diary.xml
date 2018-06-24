@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.EditDiaryActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/edit_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+
+        >
+
+        <Button
+            android:id="@+id/insert_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="插入图片" />
+
+
+    </android.support.v7.widget.Toolbar>
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/diary_layout"
+
+        >
+
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

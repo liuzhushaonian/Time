@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.ImageFragment"
+    android:background="@color/colorBlack"
+    >
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/pre_image"
+        android:contentDescription="@string/select_some"
+
+        />
+
+    <com.app.legend.time.views.SelectView
+        android:layout_width="@dimen/half_default"
+        android:layout_height="@dimen/half_default"
+        android:id="@+id/select_pager_number"
+        android:layout_gravity="start|bottom"
+        android:layout_margin="@dimen/default_margin"
+
+        />
+
+
+</FrameLayout>

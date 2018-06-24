@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <!--图片布局，包涵图片以及图片说明-->
+    <LinearLayout
+        android:id="@+id/image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--图片-->
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <ImageView
+                android:id="@+id/diary_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/diary_image" />
+
+            <ImageView
+                android:layout_width="@dimen/half_default"
+                android:layout_height="@dimen/half_default"
+                android:id="@+id/image_delete"
+                android:layout_gravity="end|top"
+                android:contentDescription="@string/image_delete"
+                android:src="@drawable/delete_image"
+                />
+
+        </FrameLayout>
+
+
+
+        <!--图片说明-->
+        <EditText
+            android:id="@+id/image_instructions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="@string/image_instructions"
+            android:inputType="text"
+            android:textSize="@dimen/image_Instructions_text_size" />
+
+    </LinearLayout>
+
+    <!--文字区域，包括编辑区域以及显示区域-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/single_diary_layout"
+        >
+
+        <!--编辑-->
+        <EditText
+            android:id="@+id/diary_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/diary_edit_text"
+            android:inputType="text"
+            android:padding="@dimen/diary_padding"
+            />
+
+        <!--预览-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/diary_text_size"
+            android:padding="@dimen/diary_padding"
+            android:id="@+id/diary_preview"
+            />
+
+    </FrameLayout>
+
+
+</LinearLayout>

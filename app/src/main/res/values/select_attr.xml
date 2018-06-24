@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SelectView">
+
+        <attr name="select_color" format="color"/>
+
+        <attr name="unSelect_color" format="color"/>
+
+    </declare-styleable>
+
+
+</resources>
