@@ -6,30 +6,35 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.LongDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.app.legend.time.R;
 import com.app.legend.time.adapter.EditAdapter;
+import com.app.legend.time.bean.AddItemInfo;
 import com.app.legend.time.bean.DiaryInfo;
 import com.app.legend.time.bean.ImageInfo;
 import com.app.legend.time.interfaces.IEditDiaryActivity;
 import com.app.legend.time.presenters.EditActivityPresenter;
 import com.app.legend.time.utils.DiaryEditText;
+import com.app.legend.time.utils.DiaryItemManager;
 
 import java.util.List;
 
 
-public class EditDiaryActivity extends BaseActivity implements IEditDiaryActivity{
+public class EditDiaryActivity extends BaseActivity<IEditDiaryActivity,EditActivityPresenter> implements IEditDiaryActivity{
 
 
-    private EditActivityPresenter presenter;
+
     private Button button;
     private static final String[] permissionStrings =
             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -42,12 +47,16 @@ public class EditDiaryActivity extends BaseActivity implements IEditDiaryActivit
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_diary);
-        presenter=new EditActivityPresenter(this);
         getComponent();
         click();
 
         initDiary();
         slideHelper.setSlideActivity(EditDiaryActivity.this);//滑动返回
+    }
+
+    @Override
+    protected EditActivityPresenter createPresenter() {
+        return new EditActivityPresenter(this);
     }
 
     private void getComponent(){
@@ -76,7 +85,7 @@ public class EditDiaryActivity extends BaseActivity implements IEditDiaryActivit
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
-            case 500:
+            case 500://接收返回结果
 
                 if(resultCode==201){
 
@@ -86,9 +95,19 @@ public class EditDiaryActivity extends BaseActivity implements IEditDiaryActivit
                         return;
                     }
 
-                    List<ImageInfo> imageInfoList= (List<ImageInfo>) data.getSerializableExtra("image_list");
+                    AddItemInfo addItemInfo=data.getParcelableExtra("result");
 
-                    handerList(imageInfoList);
+                    if (addItemInfo==null){
+
+                        Log.d("add----->>","it is null!!!!!!");
+
+                        return;
+                    }
+
+                    Log.d("add------->>>",addItemInfo.getDiaryInfoList().toString());
+
+                    DiaryItemManager.getDefault().addItem(addItemInfo);
+
 
                 }
 
@@ -154,14 +173,7 @@ public class EditDiaryActivity extends BaseActivity implements IEditDiaryActivit
      */
     private void openAlbums(){
 
-        Intent intent=new Intent(EditDiaryActivity.this,AlbumActivity.class);
-        startActivityForResult(intent,500);
-
-    }
-
-    private void handerList(List<ImageInfo> imageInfos){
-
-        presenter.handlerList(imageInfos);
+        presenter.getEditInfo(this,this.linearLayoutManager);
 
     }
 

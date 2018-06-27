@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import com.app.legend.time.R;
 import com.app.legend.time.bean.DiaryInfo;
+import com.app.legend.time.interfaces.OnDeleteItemListener;
+import com.app.legend.time.interfaces.OnEditTextFocusChangeListener;
+import com.app.legend.time.utils.DiaryItemManager;
 import com.app.legend.time.utils.TimeApp;
 import com.bumptech.glide.Glide;
 
@@ -25,7 +28,16 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
     private List<DiaryInfo> diaryInfoList;
     public static final int EDIT=0x00101;
     public static final int PREVIEW=0x00102;
+    private OnEditTextFocusChangeListener onEditTextFocusChangeListener;
+    private OnDeleteItemListener onDeleteItemListener;
 
+    public void setOnDeleteItemListener(OnDeleteItemListener onDeleteItemListener) {
+        this.onDeleteItemListener = onDeleteItemListener;
+    }
+
+    public void setOnEditTextFocusChangeListener(OnEditTextFocusChangeListener onEditTextFocusChangeListener) {
+        this.onEditTextFocusChangeListener = onEditTextFocusChangeListener;
+    }
 
     private int TYPE=EDIT;
 
@@ -38,6 +50,11 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
 
             this.diaryInfoList.add(new DiaryInfo());
         }
+
+        DiaryItemManager.getDefault().setAdapter(this);
+
+        DiaryItemManager.getDefault().setDiaryInfoList(this.diaryInfoList);
+
     }
 
     public void setDiaryInfoList(List<DiaryInfo> diaryInfoList) {
@@ -45,26 +62,9 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addDiary(DiaryInfo info) {
 
-        this.diaryInfoList.add(info);
 
-//        notifyDataSetChanged();
-        notifyItemChanged(diaryInfoList.size()-1);
-    }
 
-    public void addDiaryByPosition(DiaryInfo info, int position) {
-
-        if (position < 0 || position > this.diaryInfoList.size()) {
-            return;
-        }
-
-        this.diaryInfoList.add(position, info);
-//        notifyDataSetChanged();
-
-        notifyItemChanged(position);
-
-    }
 
     @NonNull
     @Override
@@ -78,9 +78,31 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
 
             viewHolder.delete.setOnClickListener(v -> {
                 int position=viewHolder.getAdapterPosition();
-                convert(position);
+//                convert(position);
+
+                if (this.onDeleteItemListener!=null){
+                    this.onDeleteItemListener.deleteItem(position);
+                }
             });
         }
+
+        viewHolder.editText.setOnFocusChangeListener((v, hasFocus) -> {
+
+            int position=viewHolder.getAdapterPosition();
+
+            if (position<0||position>=diaryInfoList.size()){
+                return;
+            }
+
+            DiaryInfo diaryInfo=this.diaryInfoList.get(position);
+
+            if (this.onEditTextFocusChangeListener!=null){
+
+                this.onEditTextFocusChangeListener.changeFocus(viewHolder.editText,hasFocus,diaryInfo);
+            }
+
+        });
+
 
         return viewHolder;
     }
@@ -133,6 +155,8 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
         }
 
 
+
+
     }
 
     @Override
@@ -146,7 +170,7 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
         return diaryInfoList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         View view;
         TextView textView;
@@ -221,4 +245,23 @@ public class EditAdapter extends BaseAdapter<EditAdapter.ViewHolder> {
         notifyDataSetChanged();
 
     }
+
+    /**
+     * 添加item
+     * 要先判断当前光标在哪个item上，然后根据光标对文字进行分割
+     * 1、如果光标所在的edittext没有文字，则默认添加到该item的后面
+     * 2、如果光标在文件中间，则将这段文字一分为二，光标前端文字留在原item，后端文字放入到新item里
+     * 3、如果没有光标，则默认放在最后
+     * 然而以上方法根本做不到……
+     *
+     */
+    private void addItem(){
+
+
+
+
+    }
+
+
+
 }

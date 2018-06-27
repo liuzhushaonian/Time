@@ -19,10 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.BaseActivity" />
+
         <activity
             android:name=".activities.EditDiaryActivity"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustPan">
+
+        </activity>
         <activity android:name=".activities.AlbumActivity"></activity>
     </application>
 

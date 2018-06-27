@@ -17,6 +17,7 @@ import com.app.legend.time.R;
 import com.app.legend.time.bean.DiaryInfo;
 import com.app.legend.time.bean.ImageInfo;
 import com.app.legend.time.interfaces.OnSelectListener;
+import com.app.legend.time.utils.ImageLoader;
 import com.app.legend.time.utils.TimeApp;
 import com.app.legend.time.views.SelectView;
 import com.bumptech.glide.Glide;
@@ -106,6 +107,8 @@ public class AlbumAdapter extends BaseAdapter<AlbumAdapter.ViewHolder> implement
         ImageInfo imageInfo = showList.get(position);
 
         Glide.with(TimeApp.getContext()).load(imageInfo.getPath()).into(holder.imageView);
+
+
 
         if (diaryInfoList == null) {
             return;

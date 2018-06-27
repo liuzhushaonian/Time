@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.app.legend.time.R;
 import com.app.legend.time.adapter.AlbumAdapter;
 import com.app.legend.time.adapter.FolderAdapter;
+import com.app.legend.time.bean.AddItemInfo;
+import com.app.legend.time.bean.DiaryInfo;
 import com.app.legend.time.bean.ImageInfo;
 import com.app.legend.time.fragments.PreviewImageFragment;
 import com.app.legend.time.interfaces.IAlbumActivity;
@@ -28,12 +30,13 @@ import com.app.legend.time.presenters.AlbumActivityPresenter;
 import com.app.legend.time.utils.AlbumSpace;
 import com.app.legend.time.utils.ImageUtils;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 选择照片
  */
-public class AlbumActivity extends BaseActivity implements IAlbumActivity{
+public class AlbumActivity extends BaseActivity<IAlbumActivity,AlbumActivityPresenter> implements IAlbumActivity{
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
@@ -46,13 +49,11 @@ public class AlbumActivity extends BaseActivity implements IAlbumActivity{
     private LinearLayout folderLayout;
     private TextView imagePreview;
 
-    private AlbumActivityPresenter presenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
-
-        presenter=new AlbumActivityPresenter(this);
 
         getComponent();
 
@@ -64,6 +65,11 @@ public class AlbumActivity extends BaseActivity implements IAlbumActivity{
 
         slideHelper.setSlideActivity(AlbumActivity.this);//滑动返回
 
+    }
+
+    @Override
+    protected AlbumActivityPresenter createPresenter() {
+        return new AlbumActivityPresenter(this);
     }
 
     private void getComponent(){
@@ -123,8 +129,31 @@ public class AlbumActivity extends BaseActivity implements IAlbumActivity{
         determine.setOnClickListener(v -> {
 
             List<ImageInfo> imageInfoList=adapter.getDiaryInfoList();
+
+            if (imageInfoList==null){
+                return;
+            }
+
+            List<DiaryInfo> diaryInfos=new ArrayList<>();
+
+            for (ImageInfo imageInfo:imageInfoList){
+
+                DiaryInfo diaryInfo=new DiaryInfo();
+                diaryInfo.setImg_url(imageInfo.getPath());
+                diaryInfos.add(diaryInfo);
+            }
+
             Intent intent=new Intent();
-            intent.putExtra("image_list",(Serializable) imageInfoList);
+
+            AddItemInfo addItemInfo=getIntent().getParcelableExtra("info");
+
+            if (addItemInfo==null){
+                return;
+            }
+
+            addItemInfo.setDiaryInfoList(diaryInfos);
+
+            intent.putExtra("result",addItemInfo);
             setResult(201,intent);
 
             finish();

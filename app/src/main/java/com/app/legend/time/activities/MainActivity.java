@@ -12,8 +12,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.app.legend.time.R;
+import com.app.legend.time.interfaces.IMainActivity;
+import com.app.legend.time.presenters.MainPresenter;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity<IMainActivity,MainPresenter> implements IMainActivity{
 
     private Button add_diary,see_diary;
 
@@ -28,6 +30,11 @@ public class MainActivity extends BaseActivity {
         getComponent();
 
         click();
+    }
+
+    @Override
+    protected MainPresenter createPresenter() {
+        return new MainPresenter(this);
     }
 
     /**

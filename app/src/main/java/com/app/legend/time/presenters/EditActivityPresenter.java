@@ -1,21 +1,30 @@
 package com.app.legend.time.presenters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
+import com.app.legend.time.R;
+import com.app.legend.time.activities.AlbumActivity;
+import com.app.legend.time.activities.EditDiaryActivity;
+import com.app.legend.time.bean.AddItemInfo;
 import com.app.legend.time.bean.DiaryInfo;
 import com.app.legend.time.bean.ImageInfo;
 import com.app.legend.time.interfaces.IEditDiaryActivity;
 import com.app.legend.time.utils.DiaryEditText;
 import com.app.legend.time.utils.TimeApp;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,7 +38,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class EditActivityPresenter {
+public class EditActivityPresenter extends BasePresenter<IEditDiaryActivity> {
 
     private IEditDiaryActivity activity;
     private int screenWidth;
@@ -38,162 +47,67 @@ public class EditActivityPresenter {
     public EditActivityPresenter(IEditDiaryActivity activity) {
         this.activity = activity;
 
-        screenWidth= (TimeApp.getContext().getResources().getDisplayMetrics().widthPixels/3);
-        screenHeight= (TimeApp.getContext().getResources().getDisplayMetrics().heightPixels/3);
+        screenWidth = (TimeApp.getContext().getResources().getDisplayMetrics().widthPixels / 3);
+        screenHeight = (TimeApp.getContext().getResources().getDisplayMetrics().heightPixels / 3);
     }
 
-    public void insertImage(Uri uri, DiaryEditText editText, Context context){
 
-        int start=editText.getSelectionStart();
-
-        Editable editable=editText.getEditableText();
-
-        Log.d("string--->>",editable.toString());
+    /**
+     * 收集信息
+     *
+     * @param activity
+     */
+    public void getEditInfo(Activity activity, LinearLayoutManager linearLayoutManager) {
 
         Observable
-                .create((ObservableOnSubscribe<SpannableString>) e -> {
+                .create((ObservableOnSubscribe<AddItemInfo>) e -> {
+                    AddItemInfo addItemInfo = new AddItemInfo();
 
-                    Bitmap bitmap=getSizeBitmap(uri);
-                    String editString=editText.getEditableText().toString();
+                    for (int i = 0; i < linearLayoutManager.getItemCount(); i++) {
 
-                    if (editString.isEmpty()){
-                        editString=" ";
-                    }
-                    SpannableString spannableString=new SpannableString(editString);
+                        View holder = linearLayoutManager.findViewByPosition(i);
 
-                    spannableString.setSpan(new ImageSpan(context,bitmap),0,spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        if (holder != null) {
 
-                    e.onNext(spannableString);
-                    e.onComplete();
+                            EditText editText = holder.findViewById(R.id.diary_edit_text);
 
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<SpannableString>() {
+                            if (editText.hasFocus()) {
 
-                    Disposable disposable;
+                                int index = editText.getSelectionStart();
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposable=d;
-                    }
-
-                    @Override
-                    public void onNext(SpannableString spannableString) {
-                        if (start<=0||start>=spannableString.length()){
-                            editable.append(spannableString);
-                        }else {
-                            editable.insert(start,spannableString);
+                                addItemInfo.setIndex(index);
+                                addItemInfo.setItemIndex(i);
+                                addItemInfo.setContent(editText.getText().toString());
+                                break;
+                            }
                         }
 
-                        editable.insert(start+spannableString.length(),"\n");
                     }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        disposable.dispose();
-                    }
+                    e.onNext(addItemInfo);
 
-                    @Override
-                    public void onComplete() {
-                        disposable.dispose();
-                    }
-                });
-    }
-
-
-    private Bitmap getSizeBitmap(Uri uri){
-
-        Bitmap bitmap=null;
-
-        try {
-            InputStream inputStream=TimeApp.getContext().getContentResolver().openInputStream(uri);
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inJustDecodeBounds=true;
-            BitmapFactory.decodeStream(inputStream,null,options);
-
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-            inputStream=TimeApp.getContext().getContentResolver().openInputStream(uri);
-
-            options.inSampleSize= reSize(options,screenWidth,screenHeight);
-            options.inJustDecodeBounds=false;
-            options.inPreferredConfig= Bitmap.Config.RGB_565;
-            bitmap=BitmapFactory.decodeStream(inputStream,null,options);
-
-            Log.d("bitmap--->>>",bitmap.getByteCount()/1024/1024+"M");
-
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bitmap;
-
-    }
-
-    private int reSize(BitmapFactory.Options options,int rw,int rh){
-
-        int w=options.outWidth;
-        int h=options.outHeight;
-        int inSampleSize=1;
-
-        if (h>rh||w>rw){
-            int halfH=h/2;
-            int halfW=w/2;
-
-
-            while ((halfH/inSampleSize)>=rh&&(halfW/inSampleSize)>=rw){
-
-                inSampleSize*=2;
-            }
-        }
-
-
-        Log.d("ins---->>",inSampleSize+"");
-
-        return inSampleSize;
-
-    }
-
-    public void handlerList(List<ImageInfo> imageInfos){
-
-        Observable
-                .create((ObservableOnSubscribe<List<DiaryInfo>>) e -> {
-
-                    List<DiaryInfo> diaryInfos=new ArrayList<>();
-
-                    for (int i=0;i<imageInfos.size();i++){
-
-                        DiaryInfo diaryInfo=new DiaryInfo();
-
-                        ImageInfo info=imageInfos.get(i);
-                        diaryInfo.setImg_url(info.getPath());
-                        diaryInfos.add(diaryInfo);
-                    }
-
-                    e.onNext(diaryInfos);
                     e.onComplete();
 
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<DiaryInfo>>() {
+                .subscribe(new Observer<AddItemInfo>() {
 
                     Disposable disposable;
 
                     @Override
                     public void onSubscribe(Disposable d) {
-                        disposable=d;
+                        disposable = d;
                     }
 
                     @Override
-                    public void onNext(List<DiaryInfo> diaryInfos) {
-                        activity.setDiaryData(diaryInfos);
+                    public void onNext(AddItemInfo addItemInfo) {
+
+                        Intent intent = new Intent(activity, AlbumActivity.class);
+
+                        intent.putExtra("info", addItemInfo);
+
+                        activity.startActivityForResult(intent, 500);
                     }
 
                     @Override
@@ -203,8 +117,7 @@ public class EditActivityPresenter {
 
                     @Override
                     public void onComplete() {
-                        if (!disposable.isDisposed()){
-
+                        if (!disposable.isDisposed()) {
                             disposable.dispose();
                         }
                     }
